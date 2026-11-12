@@ -676,6 +676,10 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI"
 .wrap{max-width:1280px;margin:0 auto;padding:22px 20px 40px}
 header{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
 h1{margin:0;font-size:24px;font-weight:650;letter-spacing:-.01em}
+.topbar{display:flex;flex-wrap:wrap;gap:10px 28px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:12px 18px;margin-bottom:20px}
+.who{display:flex;flex-direction:column;gap:2px}
+.who .k{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.who .v{font-size:15px;font-weight:600}
 .sub{color:var(--muted);font-size:13px;margin-top:4px}
 .filter{display:flex;flex-direction:column;gap:6px}
 .filter label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
@@ -735,9 +739,14 @@ footer{color:var(--muted);font-size:12px;margin-top:24px}
 </head>
 <body>
 <div class="wrap">
+  <div class="topbar">
+    <div class="who"><span class="k">Name</span><span class="v">Peter Kotowski</span></div>
+    <div class="who"><span class="k">Course &amp; Section</span><span class="v">BQUA2812HYB</span></div>
+    <div class="who"><span class="k">Semester</span><span class="v">Fall 2026</span></div>
+  </div>
   <header>
     <div>
-      <h1>NYC Rat Sightings</h1>
+      <h1>NYC Rat Sightings Dashboard</h1>
       <div class="sub" id="subline"></div>
     </div>
     <div class="filter">
@@ -954,11 +963,13 @@ function buildHeat(){
 // ---------- Map ----------
 function initMap(){
   map = L.map('mapEl', {zoomControl:true, preferCanvas:true}).setView([40.705,-73.94], 11);
-  const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution:'&copy; OpenStreetMap contributors &copy; CARTO', subdomains:'abcd', maxZoom:19});
+  const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/';
+  const tiles = L.tileLayer(ESRI + 'World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    attribution:'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, &copy; OpenStreetMap contributors, and the GIS User Community', maxZoom:16});
+  const labels = L.tileLayer(ESRI + 'World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {maxZoom:16, zIndex:2});
   let failed = 0;
-  tiles.on('tileerror', ()=>{ if(++failed===4) document.getElementById('mapNote').textContent = 'Street basemap needs internet. Data circles and pins still work offline.'; });
-  tiles.addTo(map);
+  tiles.on('tileerror', ()=>{ if(++failed===4) document.getElementById('mapNote').textContent = 'Esri basemap needs internet. Data circles and pins still work offline.'; });
+  tiles.addTo(map); labels.addTo(map);
   zipLayer = L.layerGroup().addTo(map);
   pinLayer = L.layerGroup();
   legendCtl = L.control({position:'bottomright'});
